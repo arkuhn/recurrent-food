@@ -1,11 +1,14 @@
 import sqlite3
 import tensorflow as tf
 
+
+"""
+Grab data
+"""
 #Assumes database is in top level data directory
 con = sqlite3.connect('./data/database.sqlite')
 con.row_factory = lambda cursor, row: row[0]
 con.text_factory = str
-
 #short = pd.read_sql_query(""" 
 #                            SELECT Summary
 #                            FROM Reviews
@@ -14,3 +17,6 @@ con.text_factory = str
 reviews = con.execute('SELECT Text FROM Reviews').fetchall()
 
 
+"""
+Tensorflow?
+"""
