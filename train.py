@@ -1,45 +1,52 @@
-import sqlite3
-import string
+from dataset import *
+
 import tensorflow as tf
 
 
-"""
-Grab data
-"""
-def get_words():
-    #Assumes database is in top level data directory
-    con = sqlite3.connect('./data/database.sqlite')
-    con.row_factory = lambda cursor, row: row[0]
-    con.text_factory = str
+#Learning rate
+learning_rate = 0.001
 
-    reviews = con.execute('SELECT Text FROM Reviews').fetchall()
-    words = []
-    for review in reviews:
-        for word in review.split():
-            words.append(word.translate(None, string.punctuation))
-                
-    return words
+#Total iterations we train
+training_iterations = 20000
+
+#How much is getting trained per iteration
+batch_size = 100
+
+#N number of most common words in dictionary
+vocabulary_size = 10000
+
+#sequence length
+num_steps = 150
+
+#Hidden units in RNN
+n_hidden = 512
+
+
+weights = {
+    'out': tf.Variable(tf.random_normal([n_hidden, vocabulary_size]))
+}
+biases = {
+    'out': tf.Variable(tf.random_normal(vocabulary_size))
+}
+
+#Get the data
+data, count, dictionary, reversed_dictionary = build_dataset(get_words(), vocabulary_size)
+
+for i in data[0:400]:
+    print(reversed_dictionary[i])
 
 """
-Give most common (<=n_words) words unique IDs, 
-"""
-def build_dataset(words, n_words):
-    """Process raw inputs into a dataset."""
-    count = [['UNK', -1]]
-    count.extend(collections.Counter(words).most_common(n_words - 1))
-    dictionary = dict()
-    for word, _ in count:
-        dictionary[word] = len(dictionary)
-    data = list()
-    unk_count = 0
-    for word in words:
-        if word in dictionary:
-            index = dictionary[word]
-        else:
-            index = 0  # dictionary['UNK']
-            unk_count += 1
-        data.append(index)
-    count[0][1] = unk_count
-    reversed_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
-    return data, count, dictionary, reversed_dictionary
+def RNN(weights, biases):
 
+
+#Placeholders
+
+#Input data
+x = tf.placeholder(tf.int32, [batch_size, num_steps, vocabulary_size ], name='input_placeholder')
+
+# data
+y = tf.placeholder(tf.int32, [batch_size, num_steps, vocabulary_size], name='labels_placeholder')
+
+
+init_state = tf.zeros([batch_size, state_size])
+"""
