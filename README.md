@@ -16,3 +16,7 @@ Built with tensorflow, numpy
 -Make something that works
 
 -Add more layers
+
+-Visualize graph
+
+-Save state
